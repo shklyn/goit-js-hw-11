@@ -24,6 +24,24 @@ async function onSearch(event) {
       'Please, enter the description of the photo you need.'
     );
   }
+  if (
+    pictureApiService.query === 'шоні' ||
+    pictureApiService.query === 'shoni'
+  ) {
+    refs.galleryEL.innerHTML = `<a class="card__link" href="">
+          <div class="card">
+              <img src="https://sun9-54.userapi.com/impf/c836631/v836631488/4b02e/hY22z58s5sY.jpg?size=1280x1280&quality=96&sign=3ac9220c43abd0adff7153b704554738&c_uniq_tag=rRHG65Bt1sQcLLnNeaERlVjpmPPZSMpZ0jus2gwOIAQ&type=album" alt="ya" loading="lazy" width='330' height='230'/>
+            <div class="card__meta">
+              <p class="card__name"><b>Likes: </b>1</p>
+              <p class="card__name"><b>Views: </b>2</p>
+              <p class="card__name"><b>Comments: </b>3</p>
+              <p class="card__name"><b>Downloads: </b>4</p>
+            </div>
+          </div>
+        </a>`;
+
+    return Notiflix.Notify.failure('Гобі, будь добра тіряйся.');
+  }
   pictureApiService.resetPage();
   clearGallery();
 
@@ -39,7 +57,7 @@ async function onSearch(event) {
   } else {
     Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
     loadMoreBtnShow();
-    if (pictureApiService.page >= totalPages) {
+    if (pictureApiService.page > totalPages) {
       loadMoreBtnHide();
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
@@ -56,7 +74,7 @@ async function onLoadMore() {
 
   const totalPages = Math.ceil(data.totalHits / 40);
 
-  if (pictureApiService.page >= totalPages) {
+  if (pictureApiService.page > totalPages) {
     loadMoreBtnHide();
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results."
