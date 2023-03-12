@@ -15,7 +15,7 @@ const modal = new SimpleLightbox('.gallery a');
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-function onSearch(event) {
+async function onSearch(event) {
   event.preventDefault();
   pictureApiService.query =
     event.currentTarget.elements.searchQuery.value.trim();
@@ -25,39 +25,45 @@ function onSearch(event) {
     );
   }
   pictureApiService.resetPage();
-
-  pictureApiService.fetchPictures().then(data => {
-    if (data.hits.length === 0) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-      loadMoreBtnEnable();
-      loadMoreBtnShow();
-    }
-
-    refs.galleryEL.insertAdjacentHTML(
-      'beforeend',
-      renderImageGallery(data.hits)
-    );
-    modal.refresh();
-  });
-
   clearGallery();
-}
 
-function onLoadMore() {
-  pictureApiService.fetchPictures().then(data => {
-    if (data.hits.length === 0) {
-      loadMoreBtnDisable();
-    }
-    refs.galleryEL.insertAdjacentHTML(
-      'beforeend',
-      renderImageGallery(data.hits)
+  const data = await pictureApiService.fetchPictures();
+  console.log(data);
+  const totalPages = Math.ceil(data.totalHits / 40);
+  if (data.hits.length === 0) {
+    clearGallery();
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
     );
-    modal.refresh();
-  });
+  } else {
+    Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    loadMoreBtnShow();
+    if (pictureApiService.page >= totalPages) {
+      loadMoreBtnHide();
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+  }
+
+  refs.galleryEL.insertAdjacentHTML('beforeend', renderImageGallery(data.hits));
+  modal.refresh();
+}
+async function onLoadMore() {
+  const data = await pictureApiService.fetchPictures();
+  console.log(data);
+
+  const totalPages = Math.ceil(data.totalHits / 40);
+
+  if (pictureApiService.page >= totalPages) {
+    loadMoreBtnHide();
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
+
+  refs.galleryEL.insertAdjacentHTML('beforeend', renderImageGallery(data.hits));
+  modal.refresh();
 }
 
 function renderImageGallery(images) {
@@ -75,7 +81,7 @@ function renderImageGallery(images) {
         return `
         <a class="card__link" href="${largeImageURL}">
           <div class="card">
-              <img src="${webformatURL}" alt="${tags}" loading="lazy" width='370' height='250'/>
+              <img src="${webformatURL}" alt="${tags}" loading="lazy" width='330' height='230'/>
             <div class="card__meta">
               <p class="card__name"><b>Likes: </b>${likes}</p>
               <p class="card__name"><b>Views: </b>${views}</p>
@@ -91,24 +97,10 @@ function renderImageGallery(images) {
 
 function clearGallery() {
   refs.galleryEL.innerHTML = '';
-  loadMoreBtnHide();
 }
 
 function loadMoreBtnHide() {
   refs.loadMoreBtn.classList.add('hidden');
-}
-
-function loadMoreBtnDisable() {
-  refs.loadMoreBtn.setAttribute('disabled', true);
-  refs.loadMoreBtn.classList.add('disable');
-
-  refs.loadMoreBtn.textContent = 'Sorry, there is no more images.';
-}
-
-function loadMoreBtnEnable() {
-  refs.loadMoreBtn.removeAttribute('disabled');
-  refs.loadMoreBtn.textContent = 'Load more';
-  refs.loadMoreBtn.classList.remove('disable');
 }
 
 function loadMoreBtnShow() {

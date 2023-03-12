@@ -5,7 +5,6 @@ export default class PictureApiService {
     this.searchQuery = '';
     this.page = 1;
   }
-
   async fetchPictures() {
     try {
       const response = await axios.get(
