@@ -25,8 +25,11 @@ async function onSearch(event) {
     );
   }
   if (
-    pictureApiService.query === 'шоні' ||
-    pictureApiService.query === 'shoni'
+    pictureApiService.query.toLowerCase().trim() === 'шоні' ||
+    pictureApiService.query.toLowerCase().trim() === 'гобі' ||
+    pictureApiService.query.toLowerCase().trim() === 'артур' ||
+    pictureApiService.query.toLowerCase().trim() === 'arthur' ||
+    pictureApiService.querytoLowerCase().trim() === 'shoni'
   ) {
     refs.galleryEL.innerHTML = `<a class="card__link" href="">
           <div class="card">
