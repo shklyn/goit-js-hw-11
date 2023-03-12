@@ -31,6 +31,7 @@ async function onSearch(event) {
   console.log(data);
   const totalPages = Math.ceil(data.totalHits / 40);
   if (data.hits.length === 0) {
+    loadMoreBtnHide();
     clearGallery();
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
